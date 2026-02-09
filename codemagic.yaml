@@ -1,35 +1,11 @@
-workflows:
-  android-workflow:
-    name: Android Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
-    environment:
-      node: 20
-    scripts:
-      - name: Install dependencies
-        script: |
-          # Nettoyage profond pour éliminer les versions de Babel en conflit
-          npm cache clean --force
-          rm -rf node_modules package-lock.json
-          npm install --legacy-peer-deps
-      - name: Link Assets (Fonts)
-        script: npx react-native-asset
-      - name: Build Android
-        script: |
-          NODE_DIR=$(dirname $(which node))
-          export PATH="$NODE_DIR:$PATH"
-          
-          mkdir -p android/app/src/main/assets
-          
-          cd android
-          chmod +x gradlew
-          ./gradlew clean assembleRelease \
-            -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
-            -Dorg.gradle.jvmargs="-Xmx4g" \
-            --no-daemon
-    artifacts:
-      - android/app/build/outputs/apk/release/*.apk
-    publishing:
-      email:
-        recipients:
-          - ton-email@exemple.com
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+
+/**
+ * Metro configuration
+ * https://facebook.github.io/metro/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {};
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);
