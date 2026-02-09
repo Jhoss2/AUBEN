@@ -8,7 +8,8 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          # Nettoyage total du cache local
+          # Nettoyage profond pour éliminer les versions de Babel en conflit
+          npm cache clean --force
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
       - name: Link Assets (Fonts)
@@ -18,7 +19,6 @@ workflows:
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # Préparer le dossier assets pour éviter une erreur Gradle
           mkdir -p android/app/src/main/assets
           
           cd android
