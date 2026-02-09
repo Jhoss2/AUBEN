@@ -8,9 +8,9 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          # Nettoyage profond pour éliminer les versions de Babel en conflit
-          npm cache clean --force
+          # Suppression propre
           rm -rf node_modules package-lock.json
+          # Installation standard
           npm install --legacy-peer-deps
       - name: Link Assets (Fonts)
         script: npx react-native-asset
