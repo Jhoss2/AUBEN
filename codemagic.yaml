@@ -15,10 +15,11 @@ workflows:
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # 2. Création des dossiers d'assets
+          # 2. Préparation forcée des répertoires
           mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/res/drawable-mdpi
           
-          # 3. Génération manuelle du bundle (On s'assure que le JS est prêt)
+          # 3. Génération manuelle du bundle (On crée le "cerveau" de l'app)
           npx react-native bundle \
             --platform android \
             --dev false \
@@ -27,10 +28,11 @@ workflows:
             --assets-dest android/app/src/main/res \
             --reset-cache
 
-          # 4. Compilation de l'APK en ignorant la tâche automatique qui crashait
+          # 4. Compilation de l'APK
+          # On utilise assembleRelease normalement, mais sans forcer l'exclusion de tâche
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -x :app:bundleReleaseJsAndAssets \
+          ./gradlew assembleRelease \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
