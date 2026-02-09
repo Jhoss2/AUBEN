@@ -8,24 +8,30 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          # Suppression propre
-          rm -rf node_modules package-lock.json
-          # Installation standard
           npm install --legacy-peer-deps
-      - name: Link Assets (Fonts)
-        script: npx react-native-asset
-      - name: Build Android
+      - name: Build Android APK
         script: |
+          # 1. Setup Node
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
+          # 2. Création forcée des dossiers d'assets (le point bloquant actuel)
           mkdir -p android/app/src/main/assets
           
+          # 3. Génération manuelle du bundle (pour bypasser l'erreur Gradle)
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res \
+            --reset-cache
+
+          # 4. Compilation finale sans l'étape de bundle automatique (déjà faite)
           cd android
           chmod +x gradlew
-          ./gradlew clean assembleRelease \
+          ./gradlew assembleRelease -x bundleReleaseJsAndAssets \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
-            -Dorg.gradle.jvmargs="-Xmx4g" \
             --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
