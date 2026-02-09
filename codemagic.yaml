@@ -36,6 +36,6 @@ workflows:
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
     publishing:
-      email: jhoss8631@gmail.com
+      email:
         recipients:
-          - jhoss8631@exemple.com
+          - ton-email@exemple.com
