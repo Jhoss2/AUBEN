@@ -1,0 +1,42 @@
+{
+  "name": "AubeSuppliesTracker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "link-assets": "npx react-native-asset"
+  },
+  "dependencies": {
+    "@react-navigation/native": "^7.0.0",
+    "@react-navigation/stack": "^7.0.0",
+    "lucide-react-native": "^0.322.0",
+    "nativewind": "^2.0.11",
+    "react": "18.2.0",
+    "react-native": "0.73.0",
+    "react-native-gesture-handler": "2.14.1",
+    "react-native-markdown-display": "^7.0.2",
+    "react-native-reanimated": "3.6.1",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-screens": "3.29.0",
+    "react-native-sqlite-storage": "6.0.1",
+    "react-native-svg": "14.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.24.0",
+    "@react-native/babel-preset": "0.73.21",
+    "@react-native/metro-config": "0.73.2",
+    "react-native-asset": "^1.1.4",
+    "tailwindcss": "3.3.2",
+    "typescript": "5.0.4"
+  },
+  "overrides": {
+    "@babel/parser": "7.24.0",
+    "@babel/core": "7.24.0",
+    "@babel/traverse": "7.24.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
