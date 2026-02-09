@@ -15,10 +15,10 @@ workflows:
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # 2. Création forcée des dossiers d'assets (le point bloquant actuel)
+          # 2. Création des dossiers d'assets
           mkdir -p android/app/src/main/assets
           
-          # 3. Génération manuelle du bundle (pour bypasser l'erreur Gradle)
+          # 3. Génération manuelle du bundle (On s'assure que le JS est prêt)
           npx react-native bundle \
             --platform android \
             --dev false \
@@ -27,10 +27,10 @@ workflows:
             --assets-dest android/app/src/main/res \
             --reset-cache
 
-          # 4. Compilation finale sans l'étape de bundle automatique (déjà faite)
+          # 4. Compilation de l'APK en ignorant la tâche automatique qui crashait
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -x bundleReleaseJsAndAssets \
+          ./gradlew assembleRelease -x :app:bundleReleaseJsAndAssets \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
