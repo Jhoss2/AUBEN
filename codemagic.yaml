@@ -8,31 +8,21 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
+          # Nettoyage radical du cache NPM et des modules
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
       - name: Build Android APK
         script: |
-          # 1. Setup environnement
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # 2. Création des dossiers nécessaires
           mkdir -p android/app/src/main/assets
           
-          # 3. Génération MANUELLE du bundle (On le fait nous-même proprement)
-          npx react-native bundle \
-            --platform android \
-            --dev false \
-            --entry-file index.js \
-            --bundle-output android/app/src/main/assets/index.android.bundle \
-            --assets-dest android/app/src/main/res \
-            --reset-cache
-
-          # 4. Compilation APK en neutralisant la commande interne qui crash
           cd android
           chmod +x gradlew
-          # On remplace la commande bundle par un simple "echo" pour que Gradle ne puisse pas échouer
+          # On laisse Gradle faire son travail normalement car Babel est maintenant verrouillé
           ./gradlew assembleRelease \
-            -PreactNativeBundleCommand="echo skipping bundle" \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
