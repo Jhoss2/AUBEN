@@ -15,10 +15,10 @@ workflows:
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # 2. Création propre des dossiers
+          # 2. Création des dossiers nécessaires
           mkdir -p android/app/src/main/assets
           
-          # 3. Génération MANUELLE du bundle (On s'assure qu'il est parfait)
+          # 3. Génération MANUELLE du bundle (On le fait nous-même proprement)
           npx react-native bundle \
             --platform android \
             --dev false \
@@ -27,12 +27,12 @@ workflows:
             --assets-dest android/app/src/main/res \
             --reset-cache
 
-          # 4. Compilation APK avec l'ordre de NE PAS rebundler
+          # 4. Compilation APK en neutralisant la commande interne qui crash
           cd android
           chmod +x gradlew
-          # La variable BUNDLE_COMMAND=echo neutralise la commande interne de Gradle
+          # On remplace la commande bundle par un simple "echo" pour que Gradle ne puisse pas échouer
           ./gradlew assembleRelease \
-            -PbundleInRelease=false \
+            -PreactNativeBundleCommand="echo skipping bundle" \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
