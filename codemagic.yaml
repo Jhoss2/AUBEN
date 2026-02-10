@@ -11,15 +11,14 @@ workflows:
           npm install --legacy-peer-deps
       - name: Build Android APK
         script: |
-          # 1. Setup Node
+          # 1. Setup environnement
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
-          # 2. Préparation forcée des répertoires
+          # 2. Création propre des dossiers
           mkdir -p android/app/src/main/assets
-          mkdir -p android/app/src/main/res/drawable-mdpi
           
-          # 3. Génération manuelle du bundle (On crée le "cerveau" de l'app)
+          # 3. Génération MANUELLE du bundle (On s'assure qu'il est parfait)
           npx react-native bundle \
             --platform android \
             --dev false \
@@ -28,11 +27,12 @@ workflows:
             --assets-dest android/app/src/main/res \
             --reset-cache
 
-          # 4. Compilation de l'APK
-          # On utilise assembleRelease normalement, mais sans forcer l'exclusion de tâche
+          # 4. Compilation APK avec l'ordre de NE PAS rebundler
           cd android
           chmod +x gradlew
+          # La variable BUNDLE_COMMAND=echo neutralise la commande interne de Gradle
           ./gradlew assembleRelease \
+            -PbundleInRelease=false \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
