@@ -8,8 +8,6 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          # Nettoyage radical du cache NPM et des modules
-          npm cache clean --force
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
       - name: Build Android APK
@@ -21,7 +19,6 @@ workflows:
           
           cd android
           chmod +x gradlew
-          # On laisse Gradle faire son travail normalement car Babel est maintenant verrouillé
           ./gradlew assembleRelease \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
