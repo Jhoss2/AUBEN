@@ -1,4 +1,61 @@
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+
+/**
+ * Cette section contrôle le moteur React Native. 
+ * On désactive bundleInRelease car on le fait manuellement dans Codemagic.
+ */
 react {
-    /* ... autres configs ... */
-    bundleInRelease = false  // Force l'arrêt du bundle automatique
+    autolinkLibrariesWithApp()
+    bundleInRelease = false 
 }
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace "com.aubensuppliestracker"
+    defaultConfig {
+        applicationId "com.aubensuppliestracker"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            // Pour Codemagic, on peut utiliser les réglages de debug ou configurer le keystore
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug // On utilise debug par simplicité pour le moment
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:hermes-android")
+}
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
