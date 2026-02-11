@@ -8,18 +8,32 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
       - name: Build Android APK
         script: |
+          # 1. Setup environnement
           NODE_DIR=$(dirname $(which node))
           export PATH="$NODE_DIR:$PATH"
           
+          # 2. Création des dossiers cibles
           mkdir -p android/app/src/main/assets
           
+          # 3. GÉNÉRATION MANUELLE DU BUNDLE
+          # On le fait ici car npx utilise le contexte direct du projet, pas celui de Gradle
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res \
+            --reset-cache
+
+          # 4. COMPILATION APK (Le "Trick")
           cd android
           chmod +x gradlew
+          # -PreactNativeBundleCommand="echo" remplace la commande Node qui crash par un simple message
           ./gradlew assembleRelease \
+            -PreactNativeBundleCommand="echo skipping-internal-bundle" \
             -PreactNativeNodeExecutableAndArgs="$NODE_DIR/node" \
             --no-daemon
     artifacts:
