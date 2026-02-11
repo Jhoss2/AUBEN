@@ -1,6 +1,8 @@
 workflows:
   android-workflow:
     name: Android Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
     environment:
       node: 20
     scripts:
@@ -8,14 +10,25 @@ workflows:
         script: npm install --legacy-peer-deps
       - name: Force Build APK
         script: |
-          # 1. Créer le dossier pour le code
+          # 1. Setup environnement
+          NODE_DIR=$(dirname $(which node))
+          export PATH="$NODE_DIR:$PATH"
+          
+          # 2. Création des dossiers
           mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/res/drawable-mdpi
           
-          # 2. Générer le code manuellement (Bypass Babel/Gradle conflict)
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
-          
-          # 3. Compiler l'APK en disant à Gradle d'ignorer le JS
+          # 3. Génération MANUELLE du bundle
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
+
+          # 4. Compilation APK
           cd android
+          chmod +x gradlew
           ./gradlew assembleRelease -PbundleInRelease=false --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
